@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>理工研究生 Privilege 測驗</title>
+  <style>
+    :root{
+      --maxw: 760px;
+      --fg: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #ffffff;
+      --btn: #111827;
+      --btnfg: #ffffff;
+      --btn2: #f3f4f6;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+    }
+    .wrap{
+      width: 100%;
+      max-width: var(--maxw);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      text-align:center;
+    }
+    h1{
+      font-size: 20px;
+      margin: 4px 0 10px;
+    }
+    .meta{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+    .toprow{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .pill{
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--fg);
+    }
+    .progress{
+      flex:1;
+      min-width: 220px;
+      height: 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      overflow:hidden;
+      border: 1px solid var(--border);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background: #111827;
+    }
+    .qbox{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 14px;
+      background: #fff;
+    }
+    .qno{
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .qtext{
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .choices{
+      display:flex;
+      gap: 12px;
+      justify-content:center;
+      margin-top: 16px;
+      flex-wrap:wrap;
+    }
+    .choice{
+      width: 180px;
+      max-width: 42vw;
+      border: 1px solid var(--border);
+      background: var(--btn2);
+      color: var(--fg);
+      padding: 12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .choice:hover{ border-color: #cbd5e1; }
+    .choice:active{ transform: scale(.99); }
+    .choice.selected{
+      background: var(--btn);
+      color: var(--btnfg);
+      border-color: var(--btn);
+    }
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top: 14px;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    button{
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--fg);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    button:hover{ border-color:#cbd5e1; }
+    button.primary{
+      background: var(--btn);
+      color: var(--btnfg);
+      border-color: var(--btn);
+    }
+    button:disabled{ opacity:.45; cursor:not-allowed; }
+    .result{
+      text-align:left;
+      margin-top: 12px;
+    }
+    .score{
+      font-size: 44px;
+      margin: 4px 0 2px;
+      letter-spacing: .5px;
+      text-align:center;
+    }
+    .band{
+      text-align:center;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 720px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .card{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background:#fff;
+    }
+    .k{
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .v{
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .small{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 10px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>理工研究生 Privilege 測驗（RPI-20）</h1>
+    <p class="meta">作答範圍：過去 12 個月；每題選「是 / 否」，點選後會自動前往下一題，你也可以返回修改。</p>
+
+    <div id="quizView">
+      <div class="toprow">
+        <div class="progress" aria-label="progress"><div class="bar" id="bar"></div></div>
+        <div class="pill" id="pos">第 1 / 20 題</div>
+        <div class="pill" id="dim">向度 A</div>
+      </div>
+
+      <div class="qbox">
+        <div class="qno" id="qno">題目 1</div>
+        <p class="qtext" id="qtext">載入中…</p>
+
+        <div class="choices">
+          <div class="choice" id="yesBtn" role="button" tabindex="0">是</div>
+          <div class="choice" id="noBtn" role="button" tabindex="0">否</div>
+        </div>
+
+        <div class="nav">
+          <button id="prevBtn">← 上一題</button>
+          <button class="primary" id="nextBtn">下一題 →</button>
+        </div>
+      </div>
+
+      <div class="small">提示：本量表衡量的是實驗室制度與資源條件，不是努力或能力。</div>
+    </div>
+
+    <div id="resultView" style="display:none;">
+      <div class="score" id="totalScore">--</div>
+      <div class="band" id="bandText">--</div>
+
+      <div class="grid result">
+        <div class="card">
+          <div class="k">向度分數（0–100）</div>
+          <div class="v" id="subScores">--</div>
+        </div>
+        <div class="card">
+          <div class="k">解讀</div>
+          <div class="v" id="interpret">--</div>
+        </div>
+      </div>
+
+      <div class="nav" style="margin-top:14px;">
+        <button id="restartBtn">重新測一次</button>
+        <button class="primary" id="backToReviewBtn">回到題目檢查</button>
+      </div>
+
+      <div class="small">低分通常表示環境缺乏保護，而非個人不夠努力。</div>
+    </div>
+  </div>
+
+<script>
+  // ============ CONFIG ============
+  // 5 向度加權（總和=1）
+  const weights = { A: 0.20, B: 0.20, C: 0.25, D: 0.15, E: 0.20 };
+
+  // RPI-20：每向度 4 題（總計 20）
+  // 二分題：是=1（有保護/有資源），否=0（缺乏保護/承擔成本）
+  const Q = [
+    // A 人際與制度（4）
+    {id: 1, dim:"A", text:"在口試、進度報告或會議中，你未曾被教授公開羞辱、怒罵或人身貶低。"},
+    {id: 2, dim:"A", text:"指導者對錯誤的回饋以技術/方法為主，而非情緒宣洩。"},
+    {id: 3, dim:"A", text:"你不需要刻意迎合、討好或揣測情緒來避免被刁難。"},
+    {id: 4, dim:"A", text:"若發生不當對待，你知道可行的求助/申訴管道，且不會受到報復。"},
+
+    // B 工時與休假（4）
+    {id: 5, dim:"B", text:"你可以因私人或家庭因素請假，而教授不會質疑研究態度。"},
+    {id: 6, dim:"B", text:"你不需要 24 小時待命回應指導者或實驗室訊息。"},
+    {id: 7, dim:"B", text:"連假、過年或寒暑假期間，不會被默認必須維持全速推進進度。"},
+    {id: 8, dim:"B", text:"生病或身體不適時，你可以暫停研究工作而不被譴責。"},
+
+    // C 資源與分工（4）—影響最大所以權重最高
+    {id: 9, dim:"C", text:"基本研究所需的儀器、耗材或算力能合理取得。"},
+    {id:10, dim:"C", text:"非研究性雜務（訂貨、管理、打掃、接待）有合理分配。"},
+    {id:11, dim:"C", text:"作者順序與貢獻認定有明確原則，且能事前溝通。"},
+    {id:12, dim:"C", text:"你不需要為他人的研究失誤/進度『背鍋』或頻繁救火。"},
+
+    // D 健康與安全（4）
+    {id:13, dim:"D", text:"研究工作未導致你出現長期睡眠障礙或明顯健康惡化。"},
+    {id:14, dim:"D", text:"研究壓力未誘發或惡化焦慮/憂鬱等症狀。"},
+    {id:15, dim:"D", text:"實驗室安全規範清楚且被落實（PPE、SOP、危害告知）。"},
+    {id:16, dim:"D", text:"趕進度時，安全不會被要求讓步或被默認可以省略。"},
+
+    // E 心理支持（4）
+    {id:17, dim:"E", text:"當你不懂時，你可以直接提問而不會被羞辱或貶低。"},
+    {id:18, dim:"E", text:"你知道明確的畢業條件與評估標準，不會臨時加碼或模糊化。"},
+    {id:19, dim:"E", text:"你能獲得實質的研究/職涯支持（投稿、會議、推薦、訓練資源）。"},
+    {id:20, dim:"E", text:"你仍能感受到研究的意義與成就感（不只是純粹消耗）。"},
+  ];
+
+  const dimNames = {
+    A: "A 人際與制度",
+    B: "B 工時與休假",
+    C: "C 資源與分工",
+    D: "D 健康與安全",
+    E: "E 心理支持",
+  };
+
+  // ============ STATE ============
+  let idx = 0; // current question index
+  const answers = Array(Q.length).fill(null); // null | 1 | 0
+
+  // ============ DOM ============
+  const quizView = document.getElementById("quizView");
+  const resultView = document.getElementById("resultView");
+
+  const bar = document.getElementById("bar");
+  const pos = document.getElementById("pos");
+  const dim = document.getElementById("dim");
+  const qno = document.getElementById("qno");
+  const qtext = document.getElementById("qtext");
+
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  const totalScoreEl = document.getElementById("totalScore");
+  const bandTextEl = document.getElementById("bandText");
+  const subScoresEl = document.getElementById("subScores");
+  const interpretEl = document.getElementById("interpret");
+
+  const restartBtn = document.getElementById("restartBtn");
+  const backToReviewBtn = document.getElementById("backToReviewBtn");
+
+  function render(){
+    const q = Q[idx];
+    qno.textContent = `題目 ${q.id}`;
+    qtext.textContent = q.text;
+    dim.textContent = `向度 ${q.dim}`;
+    pos.textContent = `第 ${idx+1} / ${Q.length} 題`;
+    bar.style.width = `${Math.round((idx / Q.length) * 100)}%`;
+
+    yesBtn.classList.toggle("selected", answers[idx] === 1);
+    noBtn.classList.toggle("selected", answers[idx] === 0);
+
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === Q.length - 1;
+
+    // next button behaves like "go next", but auto-advance also exists
+  }
+
+  function setAnswer(v){
+    answers[idx] = v;
+
+    // highlight selection instantly
+    yesBtn.classList.toggle("selected", v === 1);
+    noBtn.classList.toggle("selected", v === 0);
+
+    // auto-advance (if not last question)
+    if(idx < Q.length - 1){
+      idx++;
+      render();
+    }else{
+      // last question answered -> show results
+      showResults();
+    }
+  }
+
+  yesBtn.addEventListener("click", ()=>setAnswer(1));
+  noBtn.addEventListener("click", ()=>setAnswer(0));
+
+  // keyboard accessibility
+  yesBtn.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); setAnswer(1);} });
+  noBtn.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); setAnswer(0);} });
+
+  prevBtn.addEventListener("click", ()=>{
+    if(idx>0){ idx--; render(); }
+  });
+
+  nextBtn.addEventListener("click", ()=>{
+    if(idx < Q.length - 1){ idx++; render(); }
+  });
+
+  function band(total){
+    if(total >= 80) return {name:"高度結構保護（高 privilege）", msg:"你的制度與資源條件相對友善，較能長期穩定產出。也提醒：你享有的保護，可能正是他人缺乏的部分。"};
+    if(total >= 60) return {name:"中度結構保護（可完成但需留意耗損）", msg:"你有部分保護條件，但仍可能在某些面向承擔成本。建議優先關注最低向度。"};
+    if(total >= 40) return {name:"結構風險區（長期易耗損）", msg:"你正在承擔偏高的制度成本，長期可能影響健康與產出。可先從界線、分工、資源透明化著手。"};
+    return {name:"高度結構不利（高風險）", msg:"你的環境缺乏基本保護，這多半不是個人問題。建議優先確保安全與身心健康，並尋求外部支持或制度性協助。"};
+  }
+
+  function score(){
+    const dims = {A:[],B:[],C:[],D:[],E:[]};
+    Q.forEach((q,i)=>{
+      const v = (answers[i] === null) ? 0 : answers[i]; // unanswered counts as 0
+      dims[q.dim].push(v);
+    });
+
+    const sub = {};
+    for(const d of Object.keys(dims)){
+      const arr = dims[d];
+      const mean = arr.reduce((a,b)=>a+b,0) / arr.length; // 0..1
+      sub[d] = mean * 100;
+    }
+
+    const total = sub.A*weights.A + sub.B*weights.B + sub.C*weights.C + sub.D*weights.D + sub.E*weights.E;
+    return { total, sub };
+  }
+
+  function showResults(){
+    const { total, sub } = score();
+    const b = band(total);
+
+    quizView.style.display = "none";
+    resultView.style.display = "block";
+
+    totalScoreEl.textContent = total.toFixed(1);
+    bandTextEl.textContent = b.name;
+    interpretEl.textContent = b.msg;
+
+    // list subs, and find lowest
+    const sorted = Object.entries(sub).sort((a,b)=>a[1]-b[1]);
+    const low1 = sorted[0][0];
+    const low2 = sorted[1][0];
+
+    subScoresEl.innerHTML =
+      `${dimNames.A}：${sub.A.toFixed(1)}<br>` +
+      `${dimNames.B}：${sub.B.toFixed(1)}<br>` +
+      `${dimNames.C}：${sub.C.toFixed(1)}<br>` +
+      `${dimNames.D}：${sub.D.toFixed(1)}<br>` +
+      `${dimNames.E}：${sub.E.toFixed(1)}<br><br>` +
+      `最低向度：<b>${dimNames[low1]}</b>（其次：${dimNames[low2]}）`;
+  }
+
+  restartBtn.addEventListener("click", ()=>{
+    idx = 0;
+    for(let i=0;i<answers.length;i++) answers[i] = null;
+    resultView.style.display = "none";
+    quizView.style.display = "block";
+    render();
+  });
+
+  backToReviewBtn.addEventListener("click", ()=>{
+    resultView.style.display = "none";
+    quizView.style.display = "block";
+    // go back to last question for review
+    idx = Q.length - 1;
+    render();
+  });
+
+  // init
+  render();
+</script>
+</body>
+</html>
